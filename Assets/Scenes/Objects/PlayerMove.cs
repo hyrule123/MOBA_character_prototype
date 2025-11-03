@@ -44,6 +44,8 @@ public class PlayerMove : MonoBehaviour
     [SerializeField] private GameObject[] m_portal_arm_meshes;
     [SerializeField] private GameObject m_blue_portal;
     [SerializeField] private GameObject m_orange_portal;
+    [SerializeField] private GameObject m_orange_portal_prefab;
+    private GameObject m_launched_portal_ref;
 
     private readonly int m_state_hash = Animator.StringToHash("m_state");
     private bool IsBusy()
@@ -150,18 +152,14 @@ public class PlayerMove : MonoBehaviour
                     }
                 }
 
-                //indicator off
-                DisableAllIndicators();
-
                 //스킬 시전(busy 상태 진입)
                 TransitionState(eCharacterState.Q);
             }
-            else
-            {
-                DisableAllIndicators();
-                m_cur_indicating = eSkill.NONE;
-            }
         }
+
+        //indicator off
+        DisableAllIndicators();
+        m_cur_indicating = eSkill.NONE;
     }
 
     public void Q_End()
@@ -195,7 +193,64 @@ public class PlayerMove : MonoBehaviour
 
     public void W_Start()
     {
+        if (m_camera)
+        {
+            Ray ray = m_camera.ScreenPointToRay(Input.mousePosition);
 
+            if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, m_ground_mask))
+            {
+                Vector3 target_pos = hit.point;
+
+                Vector3 dir = target_pos - transform.position;
+                dir.y = 0;
+                float dist = dir.magnitude;
+
+                //최대 거리를 넘어서지 않을 때만 시전
+                if (dist <= m_mouse_indicator_range)
+                {
+                    dir.Normalize();
+                    transform.rotation = Quaternion.LookRotation(dir);
+
+                    if(m_orange_portal_prefab)
+                    {
+                        Vector3 init_pos = transform.position;
+                        
+                        //약간 땅에서 위로 띄워줌
+                        init_pos.y = 1;
+                        target_pos.y = 1;
+
+                        //생성 후 발사
+                        m_launched_portal_ref = Instantiate(m_orange_portal_prefab, init_pos, transform.rotation);
+                        W_PortalHandler handler = m_launched_portal_ref.GetComponent<W_PortalHandler>();
+                        handler.launch(this, m_orange_portal.transform.localScale.x, target_pos);
+                        Debug.Log("w_portal launched");
+
+                        //손에 있는 포탈 제거
+                        m_orange_portal.SetActive(false);
+                    }
+
+                    //스킬 시전(busy 상태 진입)
+                    TransitionState(eCharacterState.W);
+                }
+            }
+        }
+
+        //indicator off
+        DisableAllIndicators();
+        m_cur_indicating = eSkill.NONE;
+    }
+    public void W_End()
+    {
+        SetArrived();
+        TransitionState(eCharacterState.Idle);
+    }
+    public void On_W_PortalInstDestroy()
+    {
+        if(m_orange_portal)
+        {
+            m_orange_portal.SetActive(true);
+        }
+        m_launched_portal_ref = null;
     }
 
     public void OnMove()

@@ -1038,6 +1038,7 @@ MonoBehaviour:
   - {fileID: 1762495961}
   m_blue_portal: {fileID: 1704791789}
   m_orange_portal: {fileID: 1569613785}
+  m_orange_portal_prefab: {fileID: 3943208157863371203, guid: f4dc51ef666a9eb4f9a6bae0dc017cc0, type: 3}
 --- !u!4 &1634319097 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6731807414786439465, guid: 2e89395d527aeea40bee9f9a1fd1e906, type: 3}
