@@ -15,9 +15,13 @@ public enum eSkill
 
 public class PlayerMove : MonoBehaviour
 {
+    [SerializeField] private LayerMask m_ground_mask;   //지정 필요
+
+    private Camera m_camera;
     [SerializeField] private Animator m_animator;
 
     [SerializeField] private GameObject m_range_indicator_radius;
+    [SerializeField] private GameObject m_range_indicator_arrow;
     private eSkill m_cur_indicating = eSkill.NONE;
 
     private Vector3 m_target_position; // 이동 목표 지점
@@ -31,10 +35,7 @@ public class PlayerMove : MonoBehaviour
     [Header("Q 관련 변수")]
     [SerializeField] private float m_q_radius = 3f;
 
-
-
     private readonly int m_state_hash = Animator.StringToHash("m_state");
-
     private bool IsBusy()
     {
         return m_state > eCharacterState.Moving;
@@ -42,12 +43,14 @@ public class PlayerMove : MonoBehaviour
 
     void Start()
     {
+        m_camera = Camera.main;
         m_target_position = transform.position;
         m_target_position.y = 0;
     }
 
     void Update()
     {
+
         if(false == IsBusy())
         {
             //목표지점과의 거리 계산
@@ -58,23 +61,82 @@ public class PlayerMove : MonoBehaviour
             //목표지점에 도착해 있을 경우
             if (dist <= m_stop_dist)
             {
-                m_state = eCharacterState.Idle;
-                m_target_position = transform.position;
+                SetArrived();
+                TransitionState(eCharacterState.Idle);
             }
             //이동 중일 경우
             else
-            { 
-                m_state = eCharacterState.Moving;
-
+            {
                 //방향 정규화
                 dir.Normalize();
                 transform.position += (dir * Time.deltaTime * m_move_speed);
 
                 transform.rotation = Quaternion.LookRotation(dir);
+
+                TransitionState(eCharacterState.Moving);
             }
         }
 
-        m_animator.SetInteger(m_state_hash, ((int)m_state));
+        //범위 화살표 회전
+        if(m_range_indicator_arrow.activeInHierarchy && m_camera)
+        {
+            Ray ray = m_camera.ScreenPointToRay(Input.mousePosition);
+
+            if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, m_ground_mask))
+            {
+                Vector3 dir = hit.point - transform.position;
+                dir.y = 0;
+
+                //Euler Z 90도 회전: 화살표 방향이 플레이어 방향 기준 -90도 회전해 있는 상태임
+                m_range_indicator_arrow.transform.rotation = Quaternion.LookRotation(dir) * Quaternion.Euler(90, 0, 90);
+            }
+        }
+    }
+
+    public void OnSetTarget()
+    {
+        if (IsBusy()) { return; }
+
+        switch (m_cur_indicating)
+        {
+            case eSkill.NONE:
+                break;
+            case eSkill.Q:
+                if (m_camera)
+                {
+                    Ray ray = m_camera.ScreenPointToRay(Input.mousePosition);
+
+                    if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, m_ground_mask))
+                    {
+                        Vector3 dir = hit.point - transform.position;
+                        dir.y = 0;
+
+                        //회전시킨 뒤 
+                        transform.rotation = Quaternion.LookRotation(dir);
+
+                        //indicator off
+                        DisableAllIndicators();
+
+                        //스킬 시전(busy 상태 진입)
+                        TransitionState(eCharacterState.Q);
+                    }
+                    else
+                    {
+                        DisableAllIndicators();
+                        m_cur_indicating = eSkill.NONE;
+                        return;
+                    }
+                }
+                break;
+            case eSkill.W:
+                break;
+            case eSkill.E:
+                break;
+            case eSkill.R:
+                break;
+            default:
+                break;
+        }
     }
 
     public void ToggleRangeQ()
@@ -83,28 +145,87 @@ public class PlayerMove : MonoBehaviour
         {
             return;
         }
-        
+
+        m_cur_indicating = eSkill.Q;
+        SetArrived();
         EnableCircleIndicator(m_q_radius, m_q_radius, m_q_radius);
+        EnableArrowIndicator(m_q_radius);
     }
 
-    public void MoveTo(Vector3 newPosition)
+    public void OnMove()
+    {
+        if (m_camera)
+        {
+            Ray ray = m_camera.ScreenPointToRay(Input.mousePosition);
+
+            if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, m_ground_mask))
+            {
+                Debug.Log("우클릭한 Plane의 위치: " + hit.point);
+                MoveTo(hit.point);
+            }
+        }
+    }
+
+    private void MoveTo(Vector3 newPosition)
     {
         m_target_position = newPosition;
         m_target_position.y = 0;
 
         DisableCircleIndicator();
+        DisableArrowIndicator();
+        m_cur_indicating = eSkill.NONE;
+    }
+
+    //state를 최종적으로 변경하는 함수.
+    //실제 state를 변경 가능할 때에만 호출할 것
+    public void TransitionState(eCharacterState state)
+    {
+        m_state = state;
+        m_animator.SetInteger(m_state_hash, ((int)m_state));
     }
 
     private void EnableCircleIndicator(float x, float y, float z)
     {
         if (m_range_indicator_radius)
         {
+            m_range_indicator_radius.transform.localScale = new Vector3(x, y, z); 
             m_range_indicator_radius.SetActive(true);
-            m_range_indicator_radius.transform.localScale.Set(x, y, z);
         }
     }
     private void DisableCircleIndicator()
     {
-        m_range_indicator_radius.SetActive(false);
+        if(m_range_indicator_radius)
+        {
+            m_range_indicator_radius.SetActive(false);
+        }
+    }
+
+    private void EnableArrowIndicator(float range)
+    {
+        if(m_range_indicator_arrow)
+        {
+            m_range_indicator_arrow.transform.localScale = new Vector3(m_q_radius, 1, 1);
+            m_range_indicator_arrow.SetActive(true);
+        }
+    }
+
+    private void DisableArrowIndicator()
+    {
+        if (m_range_indicator_arrow)
+        {
+            m_range_indicator_arrow.SetActive(false);
+        }
+    }
+
+    private void DisableAllIndicators()
+    {
+        DisableCircleIndicator();
+        DisableArrowIndicator();
+    }
+    
+    //도착
+    private void SetArrived()
+    {
+        m_target_position = transform.position;
     }
 }

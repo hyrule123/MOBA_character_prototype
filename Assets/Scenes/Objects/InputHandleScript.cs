@@ -4,23 +4,21 @@ using UnityEngine.InputSystem;
 
 public class InputHandleScript : MonoBehaviour
 {
-    [SerializeField] private LayerMask  m_ground_mask;   //지정 필요
-    [SerializeField] private Camera     m_camera;   //지정 필요
-    private CameraMove m_camera_move_script;
 
     [SerializeField] private GameObject m_player;   //지정 필요
     private PlayerMove m_player_move_script;
 
+    private Camera m_camera;
+    private CameraMove m_camera_move_script;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        if(m_camera)
+        m_camera = Camera.main;
+        m_camera_move_script = m_camera.GetComponent<CameraMove>();
+        if (null == m_camera_move_script)
         {
-            m_camera_move_script = m_camera.GetComponent<CameraMove>();
-            if(null == m_camera_move_script)
-            {
-                Debug.Log("Camera Move Script 찾지 못함.");
-            }
+            Debug.Log("Camera Move Script 찾지 못함.");
         }
 
         if(m_player)
@@ -49,21 +47,18 @@ public class InputHandleScript : MonoBehaviour
 
     void OnMove()
     {
-        if (m_camera)
+        if(m_player_move_script)
         {
-            Ray ray = m_camera.ScreenPointToRay(Input.mousePosition);
-
-            if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, m_ground_mask))
-            {
-                Debug.Log("우클릭한 Plane의 위치: " + hit.point);
-                m_player_move_script.MoveTo(hit.point);
-            }
+            m_player_move_script.OnMove();
         }
     }
 
     void OnSetTarget()
     {
-
+        if(m_player_move_script)
+        {
+            m_player_move_script.OnSetTarget();
+        }
     }
 
     void OnSkill_Q()
