@@ -47,6 +47,11 @@ public class PlayerMove : MonoBehaviour
     [SerializeField] private GameObject m_orange_portal_prefab;
     private GameObject m_launched_portal_ref;
 
+    [Header("E 관련 변수")]
+    [SerializeField] private float m_E_dist = 3f;
+    [SerializeField] private float m_E_duration = 0.2f;
+    [SerializeField] private Skill_E_Hanlder m_E_handle_inst;
+
     private readonly int m_state_hash = Animator.StringToHash("m_state");
     private bool IsBusy()
     {
@@ -108,6 +113,7 @@ public class PlayerMove : MonoBehaviour
                 W_Start();
                 return;
             case eSkill.E:
+                E_Start();
                 return;
             case eSkill.R:
                 return;
@@ -251,6 +257,53 @@ public class PlayerMove : MonoBehaviour
             m_orange_portal.SetActive(true);
         }
         m_launched_portal_ref = null;
+    }
+
+    public void ToggleRangeE()
+    {
+        if (IsBusy())
+        {
+            return;
+        }
+
+        m_cur_indicating = eSkill.E;
+        SetArrived();
+        EnableArrowIndicator(m_E_dist);
+    }
+
+    public void E_Start()
+    {
+        if (m_camera)
+        {
+            Ray ray = m_camera.ScreenPointToRay(Input.mousePosition);
+
+            if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, m_ground_mask))
+            {
+                Vector3 dir = hit.point - transform.position;
+                dir.y = 0;
+
+                //회전시킨 뒤 
+                transform.rotation = Quaternion.LookRotation(dir);
+
+                if(m_E_handle_inst)
+                {
+                    m_E_handle_inst.SetParameters(m_E_dist, m_E_duration);
+                    m_E_handle_inst.enabled = true;
+                }
+
+                //스킬 시전(busy 상태 진입)
+                TransitionState(eCharacterState.E);
+            }
+        }
+
+        //indicator off
+        DisableAllIndicators();
+        m_cur_indicating = eSkill.NONE;
+    }
+    public void E_End()
+    {
+        SetArrived();
+        TransitionState(eCharacterState.Idle);
     }
 
     public void OnMove()
