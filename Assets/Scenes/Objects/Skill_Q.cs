@@ -26,7 +26,7 @@ public class Skill_Q : StateMachineBehaviour
 
         if(player_move_script)
         {
-            player_move_script.TransitionState(eCharacterState.Idle);
+            player_move_script.Q_End();
         }
     }
 

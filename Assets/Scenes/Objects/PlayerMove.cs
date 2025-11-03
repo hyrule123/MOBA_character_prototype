@@ -34,6 +34,7 @@ public class PlayerMove : MonoBehaviour
 
     [Header("Q 관련 변수")]
     [SerializeField] private float m_q_radius = 3f;
+    [SerializeField] private GameObject[] m_arm_meshes;
 
     private readonly int m_state_hash = Animator.StringToHash("m_state");
     private bool IsBusy()
@@ -100,42 +101,18 @@ public class PlayerMove : MonoBehaviour
         switch (m_cur_indicating)
         {
             case eSkill.NONE:
-                break;
+                return;
             case eSkill.Q:
-                if (m_camera)
-                {
-                    Ray ray = m_camera.ScreenPointToRay(Input.mousePosition);
-
-                    if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, m_ground_mask))
-                    {
-                        Vector3 dir = hit.point - transform.position;
-                        dir.y = 0;
-
-                        //회전시킨 뒤 
-                        transform.rotation = Quaternion.LookRotation(dir);
-
-                        //indicator off
-                        DisableAllIndicators();
-
-                        //스킬 시전(busy 상태 진입)
-                        TransitionState(eCharacterState.Q);
-                    }
-                    else
-                    {
-                        DisableAllIndicators();
-                        m_cur_indicating = eSkill.NONE;
-                        return;
-                    }
-                }
-                break;
+                Q_Start();
+                return;
             case eSkill.W:
-                break;
+                return;
             case eSkill.E:
-                break;
+                return;
             case eSkill.R:
-                break;
+                return;
             default:
-                break;
+                return;
         }
     }
 
@@ -150,6 +127,59 @@ public class PlayerMove : MonoBehaviour
         SetArrived();
         EnableCircleIndicator(m_q_radius, m_q_radius, m_q_radius);
         EnableArrowIndicator(m_q_radius);
+    }
+
+    private void Q_Start()
+    {
+        if (m_camera)
+        {
+            Ray ray = m_camera.ScreenPointToRay(Input.mousePosition);
+
+            if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, m_ground_mask))
+            {
+                Vector3 dir = hit.point - transform.position;
+                dir.y = 0;
+
+                //회전시킨 뒤 
+                transform.rotation = Quaternion.LookRotation(dir);
+
+                //팔길이 늘린다
+                for (int i = 0; i < m_arm_meshes.Length; ++i)
+                {
+                    if (m_arm_meshes[i])
+                    {
+                        m_arm_meshes[i].transform.localScale = new Vector3(2, 2, 2);
+                    }
+                }
+
+                //indicator off
+                DisableAllIndicators();
+
+                //스킬 시전(busy 상태 진입)
+                TransitionState(eCharacterState.Q);
+            }
+            else
+            {
+                DisableAllIndicators();
+                m_cur_indicating = eSkill.NONE;
+            }
+        }
+    }
+
+    public void Q_End()
+    {
+        SetArrived();
+
+        //팔길이 원상복구
+        for (int i = 0; i < m_arm_meshes.Length; ++i)
+        {
+            if (m_arm_meshes[i])
+            {
+                m_arm_meshes[i].transform.localScale = Vector3.one;
+            }
+        }
+
+        TransitionState(eCharacterState.Idle);
     }
 
     public void OnMove()
