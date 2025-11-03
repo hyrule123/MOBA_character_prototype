@@ -68,7 +68,7 @@ public class InputHandleScript : MonoBehaviour
 
     void OnSkill_W()
     {
-
+        m_player_move_script.ToggleRangeW();
     }
 
     void OnSkill_E()
