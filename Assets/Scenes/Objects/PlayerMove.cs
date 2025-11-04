@@ -37,15 +37,11 @@ public class PlayerMove : MonoBehaviour
 
     [Header("Q 관련 변수")]
     [SerializeField] private float m_q_radius = 3f;
-    [SerializeField] private GameObject[] m_fist_arm_meshes;
+    [SerializeField] private Skill_Q_Handler m_Q_handle_inst;
 
     [Header("W 관련 변수")]
     [SerializeField] private float m_w_radius = 3f;
-    [SerializeField] private GameObject[] m_portal_arm_meshes;
-    [SerializeField] private GameObject m_blue_portal;
-    [SerializeField] private GameObject m_orange_portal;
-    [SerializeField] private GameObject m_orange_portal_prefab;
-    private GameObject m_launched_portal_ref;
+    [SerializeField] private Skill_W_Handler m_W_handle_inst;
 
     [Header("E 관련 변수")]
     [SerializeField] private float m_E_dist = 3f;
@@ -67,6 +63,11 @@ public class PlayerMove : MonoBehaviour
         m_camera = Camera.main;
         m_target_position = transform.position;
         m_target_position.y = 0;
+
+        m_Q_handle_inst.enabled = false;
+        m_W_handle_inst.enabled = false;
+        m_E_handle_inst.enabled = false;
+        m_R_handle_inst.enabled = false;
     }
 
     void Update()
@@ -154,13 +155,10 @@ public class PlayerMove : MonoBehaviour
                 //회전시킨 뒤 
                 transform.rotation = Quaternion.LookRotation(dir);
 
-                //팔길이 늘린다
-                for (int i = 0; i < m_fist_arm_meshes.Length; ++i)
+                //Q스킬 핸들 스크립트 활성화
+                if(m_Q_handle_inst)
                 {
-                    if (m_fist_arm_meshes[i])
-                    {
-                        m_fist_arm_meshes[i].transform.localScale = new Vector3(2, 2, 2);
-                    }
+                    m_Q_handle_inst.enabled = true;
                 }
 
                 //스킬 시전(busy 상태 진입)
@@ -175,17 +173,12 @@ public class PlayerMove : MonoBehaviour
 
     public void Q_End()
     {
-        SetArrived();
-
-        //팔길이 원상복구
-        for (int i = 0; i < m_fist_arm_meshes.Length; ++i)
+        if(m_Q_handle_inst)
         {
-            if (m_fist_arm_meshes[i])
-            {
-                m_fist_arm_meshes[i].transform.localScale = Vector3.one;
-            }
+            m_Q_handle_inst.enabled = false;
         }
 
+        SetArrived();
         TransitionState(eCharacterState.Idle);
     }
 
@@ -221,22 +214,10 @@ public class PlayerMove : MonoBehaviour
                     dir.Normalize();
                     transform.rotation = Quaternion.LookRotation(dir);
 
-                    if(m_orange_portal_prefab)
+                    if(m_W_handle_inst)
                     {
-                        Vector3 init_pos = transform.position;
-                        
-                        //약간 땅에서 위로 띄워줌
-                        init_pos.y = 1;
-                        target_pos.y = 1;
-
-                        //생성 후 발사
-                        m_launched_portal_ref = Instantiate(m_orange_portal_prefab, init_pos, transform.rotation);
-                        W_PortalHandler handler = m_launched_portal_ref.GetComponent<W_PortalHandler>();
-                        handler.launch(this, m_orange_portal.transform.localScale.x, target_pos);
-                        Debug.Log("w_portal launched");
-
-                        //손에 있는 포탈 제거
-                        m_orange_portal.SetActive(false);
+                        m_W_handle_inst.SetParameters(target_pos);
+                        m_W_handle_inst.enabled = true;
                     }
 
                     //스킬 시전(busy 상태 진입)
@@ -251,17 +232,15 @@ public class PlayerMove : MonoBehaviour
     }
     public void W_End()
     {
+        if(m_W_handle_inst)
+        {
+            m_W_handle_inst.enabled = false;
+        }
+
         SetArrived();
         TransitionState(eCharacterState.Idle);
     }
-    public void On_W_PortalInstDestroy()
-    {
-        if(m_orange_portal)
-        {
-            m_orange_portal.SetActive(true);
-        }
-        m_launched_portal_ref = null;
-    }
+
 
     public void ToggleRangeE()
     {

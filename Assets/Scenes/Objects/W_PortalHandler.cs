@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class W_PortalHandler : MonoBehaviour
 {
-    private PlayerMove m_owner_script;
+    private Skill_W_Handler m_owner_script;
 
     [SerializeField] private float m_speed = 3f;
 
@@ -76,7 +76,7 @@ public class W_PortalHandler : MonoBehaviour
         }
     }
 
-    public void launch(PlayerMove owner, float initial_scale, Vector3 dest_pos)
+    public void launch(Skill_W_Handler owner, float initial_scale, Vector3 dest_pos)
     {
         m_owner_script = owner;
         m_is_ready = true;
