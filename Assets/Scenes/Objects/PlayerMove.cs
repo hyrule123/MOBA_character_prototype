@@ -15,25 +15,22 @@ public enum eSkill
 
 public class PlayerMove : MonoBehaviour
 {
-    [SerializeField] private LayerMask m_ground_mask;   //지정 필요
+    [SerializeField] private LayerMask m_ground_mask;
 
     private Camera m_camera;
     [SerializeField] private Animator m_animator;
-
-    [SerializeField] private GameObject m_range_indicator_radius;
-    [SerializeField] private GameObject m_range_indicator_arrow;
-    [SerializeField] private GameObject m_range_indicator_mouse;
-    private float m_mouse_indicator_range;
-
-    private eSkill m_cur_indicating = eSkill.NONE;
-
-    private Vector3 m_target_position; // 이동 목표 지점
-
+    
     private eCharacterState m_state = eCharacterState.Idle;
+
+    //Indicator
+    private eSkill m_cur_indicating = eSkill.NONE;
+    [SerializeField] private RangeIndicatorHandler m_range_indicator_handler;
+
 
     [Header("이동 관련 설정")]
     [SerializeField] private float m_move_speed = 3.0f;    // 초당 이동 속도
     [SerializeField] private float m_stop_dist = 0.1f; // 목표 지점과 이 거리만큼 가까워지면 멈춤
+    private Vector3 m_target_position; // 이동 목표 지점
 
     [Header("Q 관련 변수")]
     [SerializeField] private float m_q_radius = 3f;
@@ -99,8 +96,7 @@ public class PlayerMove : MonoBehaviour
             }
         }
 
-        UpdateArrowIndicator();
-        UpdateMouseIndicator();
+
     }
 
     public void OnSetTarget()
@@ -137,8 +133,8 @@ public class PlayerMove : MonoBehaviour
 
         m_cur_indicating = eSkill.Q;
         SetArrived();
-        EnableCircleIndicator(m_q_radius, m_q_radius, m_q_radius);
-        EnableArrowIndicator(m_q_radius);
+        m_range_indicator_handler.EnableCircleIndicator(m_q_radius, m_q_radius, m_q_radius);
+        m_range_indicator_handler.EnableArrowIndicator(m_q_radius);
     }
 
     private void Q_Start()
@@ -167,7 +163,7 @@ public class PlayerMove : MonoBehaviour
         }
 
         //indicator off
-        DisableAllIndicators();
+        m_range_indicator_handler.DisableAllIndicators();
         m_cur_indicating = eSkill.NONE;
     }
 
@@ -190,8 +186,8 @@ public class PlayerMove : MonoBehaviour
         }
 
         m_cur_indicating = eSkill.W;
-        EnableCircleIndicator(m_w_radius, m_w_radius, m_w_radius);
-        EnableMouseIndicator(m_w_radius);
+        m_range_indicator_handler.EnableCircleIndicator(m_w_radius, m_w_radius, m_w_radius);
+        m_range_indicator_handler.EnableMouseIndicator(m_w_radius);
     }
 
     public void W_Start()
@@ -209,7 +205,7 @@ public class PlayerMove : MonoBehaviour
                 float dist = dir.magnitude;
 
                 //최대 거리를 넘어서지 않을 때만 시전
-                if (dist <= m_mouse_indicator_range)
+                if (dist <= m_range_indicator_handler.mouse_indicator_range)
                 {
                     dir.Normalize();
                     transform.rotation = Quaternion.LookRotation(dir);
@@ -227,7 +223,7 @@ public class PlayerMove : MonoBehaviour
         }
 
         //indicator off
-        DisableAllIndicators();
+        m_range_indicator_handler.DisableAllIndicators();
         m_cur_indicating = eSkill.NONE;
     }
     public void W_End()
@@ -250,7 +246,7 @@ public class PlayerMove : MonoBehaviour
         }
 
         m_cur_indicating = eSkill.E;
-        EnableArrowIndicator(m_E_dist);
+        m_range_indicator_handler.EnableArrowIndicator(m_E_dist);
     }
 
     public void E_Start()
@@ -279,7 +275,7 @@ public class PlayerMove : MonoBehaviour
         }
 
         //indicator off
-        DisableAllIndicators();
+        m_range_indicator_handler.DisableAllIndicators();
         m_cur_indicating = eSkill.NONE;
     }
     public void E_End()
@@ -295,7 +291,7 @@ public class PlayerMove : MonoBehaviour
         }
 
         m_cur_indicating = eSkill.R;
-        EnableArrowIndicator(m_R_range);
+        m_range_indicator_handler.EnableArrowIndicator(m_R_range);
     }
     public void R_Start()
     {
@@ -323,7 +319,7 @@ public class PlayerMove : MonoBehaviour
         }
 
         //indicator off
-        DisableAllIndicators();
+        m_range_indicator_handler.DisableAllIndicators();
         m_cur_indicating = eSkill.NONE;
     }
     public void R_End()
@@ -352,7 +348,7 @@ public class PlayerMove : MonoBehaviour
         m_target_position = newPosition;
         m_target_position.y = 0;
 
-        DisableAllIndicators();
+        m_range_indicator_handler.DisableAllIndicators();
         m_cur_indicating = eSkill.NONE;
     }
 
@@ -362,108 +358,6 @@ public class PlayerMove : MonoBehaviour
     {
         m_state = state;
         m_animator.SetInteger(m_state_hash, ((int)m_state));
-    }
-    private void EnableCircleIndicator(float x, float y, float z)
-    {
-        if (m_range_indicator_radius)
-        {
-            m_range_indicator_radius.transform.localScale = new Vector3(x, y, z); 
-            m_range_indicator_radius.SetActive(true);
-        }
-    }
-    private void DisableCircleIndicator()
-    {
-        if(m_range_indicator_radius)
-        {
-            m_range_indicator_radius.SetActive(false);
-        }
-    }
-
-    private void EnableArrowIndicator(float range)
-    {
-        if(m_range_indicator_arrow)
-        {
-            m_range_indicator_arrow.transform.localScale = new Vector3(m_q_radius, 1, 1);
-            m_range_indicator_arrow.SetActive(true);
-        }
-    }
-
-    private void UpdateArrowIndicator()
-    {
-        //범위 화살표 회전
-        if (m_range_indicator_arrow.activeInHierarchy && m_camera)
-        {
-            Ray ray = m_camera.ScreenPointToRay(Input.mousePosition);
-
-            if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, m_ground_mask))
-            {
-                Vector3 dir = hit.point - transform.position;
-                dir.y = 0;
-
-                //Euler Z 90도 회전: 화살표 방향이 플레이어 방향 기준 -90도 회전해 있는 상태임
-                m_range_indicator_arrow.transform.rotation = Quaternion.LookRotation(dir) * Quaternion.Euler(90, 0, 90);
-            }
-        }
-    }
-
-    private void DisableArrowIndicator()
-    {
-        if (m_range_indicator_arrow)
-        {
-            m_range_indicator_arrow.SetActive(false);
-        }
-    }
-
-    private void EnableMouseIndicator(float range)
-    {
-        if(m_range_indicator_mouse)
-        {
-            m_mouse_indicator_range = range;
-
-            m_range_indicator_mouse.SetActive(true);
-        }
-    }
-
-    private void UpdateMouseIndicator()
-    {
-        if(m_range_indicator_mouse && m_range_indicator_mouse.activeInHierarchy)
-        {
-            Ray ray = m_camera.ScreenPointToRay(Input.mousePosition);
-
-            if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, m_ground_mask))
-            {
-                Vector3 target_pos = hit.point;
-
-                Vector3 dir = target_pos - transform.position;
-                dir.y = 0;
-                float dist = dir.magnitude;
-
-                //만약 최대 거리를 넘어선다면 최대 거리 안으로 좁힌다
-                if (dist > m_mouse_indicator_range)
-                {
-                    dir.Normalize();
-                    target_pos = transform.position + dir * m_mouse_indicator_range;
-                }
-
-                target_pos.y = m_range_indicator_mouse.transform.position.y;
-                m_range_indicator_mouse.transform.position = target_pos;
-            }
-        }
-    }
-
-    private void DisableMouseIndicator()
-    {
-        if (m_range_indicator_mouse)
-        {
-            m_range_indicator_mouse.SetActive(false);
-        }
-    }
-
-    private void DisableAllIndicators()
-    {
-        DisableCircleIndicator();
-        DisableArrowIndicator();
-        DisableMouseIndicator();
     }
     
     //도착
