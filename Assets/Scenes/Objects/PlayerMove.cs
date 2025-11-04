@@ -52,6 +52,10 @@ public class PlayerMove : MonoBehaviour
     [SerializeField] private float m_E_duration = 0.2f;
     [SerializeField] private Skill_E_Hanlder m_E_handle_inst;
 
+    [Header("R 관련 변수")]
+    [SerializeField] private float m_R_range = 3f;
+    [SerializeField] private Skill_R_Handler m_R_handle_inst;
+
     private readonly int m_state_hash = Animator.StringToHash("m_state");
     private bool IsBusy()
     {
@@ -116,6 +120,7 @@ public class PlayerMove : MonoBehaviour
                 E_Start();
                 return;
             case eSkill.R:
+                R_Start();
                 return;
             default:
                 return;
@@ -192,7 +197,6 @@ public class PlayerMove : MonoBehaviour
         }
 
         m_cur_indicating = eSkill.W;
-        SetArrived();
         EnableCircleIndicator(m_w_radius, m_w_radius, m_w_radius);
         EnableMouseIndicator(m_w_radius);
     }
@@ -267,7 +271,6 @@ public class PlayerMove : MonoBehaviour
         }
 
         m_cur_indicating = eSkill.E;
-        SetArrived();
         EnableArrowIndicator(m_E_dist);
     }
 
@@ -303,6 +306,51 @@ public class PlayerMove : MonoBehaviour
     public void E_End()
     {
         SetArrived();
+        TransitionState(eCharacterState.Idle);
+    }
+    public void ToggleRangeR()
+    {
+        if (IsBusy())
+        {
+            return;
+        }
+
+        m_cur_indicating = eSkill.R;
+        EnableArrowIndicator(m_R_range);
+    }
+    public void R_Start()
+    {
+        if (m_camera)
+        {
+            Ray ray = m_camera.ScreenPointToRay(Input.mousePosition);
+
+            if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, m_ground_mask))
+            {
+                Vector3 dir = hit.point - transform.position;
+                dir.y = 0;
+
+                //회전시킨 뒤 
+                transform.rotation = Quaternion.LookRotation(dir);
+
+                //궁극기 스크립트 활성화
+                if(m_R_handle_inst)
+                {
+                    m_R_handle_inst.enabled = true;
+                }
+
+                //스킬 시전(busy 상태 진입)
+                TransitionState(eCharacterState.R);
+            }
+        }
+
+        //indicator off
+        DisableAllIndicators();
+        m_cur_indicating = eSkill.NONE;
+    }
+    public void R_End()
+    {
+        SetArrived();
+        m_R_handle_inst.enabled = false;
         TransitionState(eCharacterState.Idle);
     }
 

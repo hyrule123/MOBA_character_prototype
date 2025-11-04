@@ -78,6 +78,6 @@ public class InputHandleScript : MonoBehaviour
 
     void OnSkill_R()
     {
-        
+        m_player_move_script.ToggleRangeR();
     }
 }
