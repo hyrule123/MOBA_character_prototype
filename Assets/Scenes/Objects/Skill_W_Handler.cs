@@ -7,7 +7,8 @@ public class Skill_W_Handler : MonoBehaviour
     [SerializeField] private GameObject m_blue_portal;
     [SerializeField] private GameObject m_orange_portal;
     [SerializeField] private GameObject m_orange_portal_prefab;
-    private GameObject m_launched_portal_ref;
+    private W_PortalHandler m_launched_portal_handler;
+    public W_PortalHandler launched_portal_handler { get { return m_launched_portal_handler; } }
 
     private bool m_b_ready;
     private Vector3 m_target_pos;
@@ -31,9 +32,9 @@ public class Skill_W_Handler : MonoBehaviour
             m_target_pos.y = 1;
 
             //생성 후 발사
-            m_launched_portal_ref = Instantiate(m_orange_portal_prefab, init_pos, transform.rotation);
-            W_PortalHandler handler = m_launched_portal_ref.GetComponent<W_PortalHandler>();
-            handler.launch(this, m_orange_portal.transform.localScale.x, m_target_pos);
+            GameObject inst = Instantiate(m_orange_portal_prefab, init_pos, transform.rotation);
+            m_launched_portal_handler = inst.GetComponent<W_PortalHandler>();
+            m_launched_portal_handler.launch(this, m_orange_portal.transform.localScale.x, m_target_pos);
             Debug.Log("w_portal launched");
 
             //손에 있는 포탈 제거
@@ -47,12 +48,21 @@ public class Skill_W_Handler : MonoBehaviour
         {
             m_orange_portal.SetActive(true);
         }
-        m_launched_portal_ref = null;
+        m_launched_portal_handler = null;
     }
 
     private void OnDisable()
     {
         m_b_ready = false;
+    }
+
+    //Stop indicators if the portal exists
+    public void StopIndicator()
+    {
+        if(m_launched_portal_handler)
+        {
+            m_launched_portal_handler.range_indicator.DisableAllIndicators();
+        }
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created

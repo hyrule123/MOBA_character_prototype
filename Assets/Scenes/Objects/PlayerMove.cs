@@ -26,7 +26,6 @@ public class PlayerMove : MonoBehaviour
     private eSkill m_cur_indicating = eSkill.NONE;
     [SerializeField] private RangeIndicatorHandler m_range_indicator_handler;
 
-
     [Header("이동 관련 설정")]
     [SerializeField] private float m_move_speed = 3.0f;    // 초당 이동 속도
     [SerializeField] private float m_stop_dist = 0.1f; // 목표 지점과 이 거리만큼 가까워지면 멈춤
@@ -131,10 +130,18 @@ public class PlayerMove : MonoBehaviour
             return;
         }
 
-        m_cur_indicating = eSkill.Q;
         SetArrived();
+
+        m_cur_indicating = eSkill.Q;
         m_range_indicator_handler.EnableCircleIndicator(m_q_radius, m_q_radius, m_q_radius);
         m_range_indicator_handler.EnableArrowIndicator(m_q_radius);
+
+        var portal_handler = m_W_handle_inst.launched_portal_handler;
+        if (portal_handler)
+        {
+            portal_handler.range_indicator.EnableCircleIndicator(m_q_radius, m_q_radius, m_q_radius);
+            portal_handler.range_indicator.EnableArrowIndicator(m_q_radius);
+        }
     }
 
     private void Q_Start()
@@ -154,6 +161,7 @@ public class PlayerMove : MonoBehaviour
                 //Q스킬 핸들 스크립트 활성화
                 if(m_Q_handle_inst)
                 {
+                    //m_Q_handle_inst.SetParameters()
                     m_Q_handle_inst.enabled = true;
                 }
 
@@ -164,6 +172,7 @@ public class PlayerMove : MonoBehaviour
 
         //indicator off
         m_range_indicator_handler.DisableAllIndicators();
+        m_W_handle_inst.StopIndicator();
         m_cur_indicating = eSkill.NONE;
     }
 
@@ -349,6 +358,8 @@ public class PlayerMove : MonoBehaviour
         m_target_position.y = 0;
 
         m_range_indicator_handler.DisableAllIndicators();
+        m_W_handle_inst.StopIndicator();
+        
         m_cur_indicating = eSkill.NONE;
     }
 

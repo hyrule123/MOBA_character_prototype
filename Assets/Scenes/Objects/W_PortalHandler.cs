@@ -6,6 +6,7 @@ public class W_PortalHandler : MonoBehaviour
     private Skill_W_Handler m_owner_script;
 
     private RangeIndicatorHandler m_range_indicator_inst;
+    public RangeIndicatorHandler range_indicator { get { return m_range_indicator_inst; } }
 
     [SerializeField] private float m_speed = 3f;
 

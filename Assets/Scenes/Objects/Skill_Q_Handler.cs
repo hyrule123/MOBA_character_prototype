@@ -1,9 +1,16 @@
+using NUnit.Framework;
 using UnityEngine;
 
 public class Skill_Q_Handler : MonoBehaviour
 {
     [SerializeField] private GameObject m_upper_arm;
     [SerializeField] private GameObject m_lower_arm;
+
+    private W_PortalHandler m_portal_inst;
+    public void SetParameters()
+    {
+
+    }
 
     private void OnEnable()
     {
