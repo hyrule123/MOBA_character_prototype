@@ -4,7 +4,6 @@ using UnityEngine;
 public class Skill_W_Handler : MonoBehaviour
 {
     [SerializeField] private GameObject[] m_portal_arm_meshes;
-    [SerializeField] private GameObject m_blue_portal;
     [SerializeField] private GameObject m_orange_portal;
     [SerializeField] private GameObject m_orange_portal_prefab;
     private W_PortalHandler m_launched_portal_handler;

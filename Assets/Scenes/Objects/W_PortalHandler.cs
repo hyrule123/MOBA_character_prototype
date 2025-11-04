@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class W_PortalHandler : MonoBehaviour
 {
@@ -94,11 +95,10 @@ public class W_PortalHandler : MonoBehaviour
 
     private void OnDestroy()
     {
+        //m_cloned_arms.Clear();
         if(m_owner_script)
         {
             m_owner_script.On_W_PortalInstDestroy();
         }
     }
-
-
 }

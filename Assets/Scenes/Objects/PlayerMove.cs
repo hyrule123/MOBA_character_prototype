@@ -174,14 +174,22 @@ public class PlayerMove : MonoBehaviour
 
             if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, m_ground_mask))
             {
+                //기본 방향: 마우스 지정 방향
                 Vector3 dir = hit.point - transform.position;
                 dir.y = 0;
+
+                //만약 포탈이 있다면: 플레이어의 정면 방향으로 시전
+                if(m_W_handle_inst.launched_portal_handler)
+                {
+                    dir = transform.forward;
+                    dir.y = 0;
+                }
 
                 //회전시킨 뒤 
                 transform.rotation = Quaternion.LookRotation(dir);
 
                 //Q스킬 핸들 스크립트 활성화
-                if(m_Q_handle_inst)
+                if (m_Q_handle_inst)
                 {
                     m_Q_handle_inst.SetParameters(m_W_handle_inst.launched_portal_handler, hit.point);
                     m_Q_handle_inst.enabled = true;
@@ -191,6 +199,7 @@ public class PlayerMove : MonoBehaviour
                 TransitionState(eCharacterState.Q);
             }
         }
+
 
         //indicator off
         m_range_indicator_handler.DisableAllIndicators();

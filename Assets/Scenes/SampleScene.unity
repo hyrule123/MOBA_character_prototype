@@ -1078,6 +1078,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_upper_arm: {fileID: 72283216}
   m_lower_arm: {fileID: 826334463}
+  m_blue_portal_inst: {fileID: 1704791789}
+  m_blue_portal_prefab: {fileID: 671436020413560329, guid: 499005c9340309043bbfbed108608480, type: 3}
 --- !u!114 &1634319101
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1091,7 +1093,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_portal_arm_meshes: []
-  m_blue_portal: {fileID: 1704791789}
   m_orange_portal: {fileID: 1569613785}
   m_orange_portal_prefab: {fileID: 3943208157863371203, guid: f4dc51ef666a9eb4f9a6bae0dc017cc0, type: 3}
 --- !u!1 &1704791789 stripped
