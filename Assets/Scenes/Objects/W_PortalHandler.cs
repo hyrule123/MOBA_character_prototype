@@ -5,6 +5,8 @@ public class W_PortalHandler : MonoBehaviour
 {
     private Skill_W_Handler m_owner_script;
 
+    private RangeIndicatorHandler m_range_indicator_inst;
+
     [SerializeField] private float m_speed = 3f;
 
     private float m_initial_scale = 0.3f;
@@ -17,6 +19,12 @@ public class W_PortalHandler : MonoBehaviour
     private Vector3 m_destination_pos;
     private bool m_is_arrived = false;
     private const float m_arrive_threshold = 0.1f;
+
+    private void Awake()
+    {
+        m_range_indicator_inst = GetComponentInChildren<RangeIndicatorHandler>();
+        Assert.IsNotNull(m_range_indicator_inst);
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
