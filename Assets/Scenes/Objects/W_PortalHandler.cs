@@ -21,6 +21,21 @@ public class W_PortalHandler : MonoBehaviour
     private bool m_is_arrived = false;
     private const float m_arrive_threshold = 0.1f;
 
+    private bool m_b_delay_destroy = false;
+
+    public void DelayDestroy(bool need_delay)
+    {
+        m_b_delay_destroy = need_delay;
+    }
+
+    public void launch(Skill_W_Handler owner, float initial_scale, Vector3 dest_pos)
+    {
+        m_owner_script = owner;
+        m_is_ready = true;
+        m_initial_scale = initial_scale;
+        m_destination_pos = dest_pos;
+    }
+
     private void Awake()
     {
         m_range_indicator_inst = GetComponentInChildren<RangeIndicatorHandler>();
@@ -69,7 +84,7 @@ public class W_PortalHandler : MonoBehaviour
         else
         {
             m_duration -= Time.deltaTime;
-            if (m_duration < 0)
+            if (false == m_b_delay_destroy && m_duration < 0)
             {
                 Debug.Log("w Destroyed!!");
                 Destroy(this.gameObject);
@@ -85,11 +100,5 @@ public class W_PortalHandler : MonoBehaviour
         }
     }
 
-    public void launch(Skill_W_Handler owner, float initial_scale, Vector3 dest_pos)
-    {
-        m_owner_script = owner;
-        m_is_ready = true;
-        m_initial_scale = initial_scale;
-        m_destination_pos = dest_pos;
-    }
+
 }

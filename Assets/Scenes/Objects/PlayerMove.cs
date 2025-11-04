@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public enum eCharacterState
@@ -68,7 +69,6 @@ public class PlayerMove : MonoBehaviour
 
     void Update()
     {
-
         if(false == IsBusy())
         {
             //목표지점과의 거리 계산
@@ -94,8 +94,6 @@ public class PlayerMove : MonoBehaviour
                 TransitionState(eCharacterState.Moving);
             }
         }
-
-
     }
 
     public void OnSetTarget()
@@ -141,6 +139,30 @@ public class PlayerMove : MonoBehaviour
         {
             portal_handler.range_indicator.EnableCircleIndicator(m_q_radius, m_q_radius, m_q_radius);
             portal_handler.range_indicator.EnableArrowIndicator(m_q_radius);
+
+            //화살표 방향 업데이트를 중지한다.
+            m_range_indicator_handler.stop_arrow_direction_update = true;
+
+            //현재 플레이어가 향하고 있는 방향을 바라보도록 지정
+            Vector3 fwd = transform.forward;
+            fwd.y = 0;
+            m_range_indicator_handler.SetArrowDirection(fwd);
+        }
+
+        StartCoroutine(Q_RangeUpdate());
+    }
+
+    private IEnumerator Q_RangeUpdate()
+    {
+        //Q 범위 표시 중에 본체의 화살표 방향을 업데이트해야 하는지 말아야 하는지를 지속 검사한다
+        while(m_cur_indicating == eSkill.Q)
+        {
+            var portal_handler = m_W_handle_inst.launched_portal_handler;
+
+            //포탈이 있으면 본체의 스킬 시전 방향은 업데이트하지 않는다
+            m_range_indicator_handler.stop_arrow_direction_update = (null != portal_handler);
+
+            yield return null;
         }
     }
 
@@ -161,7 +183,7 @@ public class PlayerMove : MonoBehaviour
                 //Q스킬 핸들 스크립트 활성화
                 if(m_Q_handle_inst)
                 {
-                    //m_Q_handle_inst.SetParameters()
+                    m_Q_handle_inst.SetParameters(m_W_handle_inst.launched_portal_handler, hit.point);
                     m_Q_handle_inst.enabled = true;
                 }
 

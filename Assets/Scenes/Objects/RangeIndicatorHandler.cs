@@ -10,8 +10,18 @@ public class RangeIndicatorHandler : MonoBehaviour
     [SerializeField] private GameObject m_range_indicator_arrow;
     [SerializeField] private GameObject m_range_indicator_mouse;
     private float m_mouse_indicator_range;
-
     public float mouse_indicator_range { get{ return m_mouse_indicator_range; } }
+
+    private bool m_b_stop_arrow_direction_update = false;
+    public bool stop_arrow_direction_update { 
+        get { return m_b_stop_arrow_direction_update; }
+        set { m_b_stop_arrow_direction_update = value; }
+    }
+
+    public void SetArrowDirection(Vector3 direction)
+    {
+        m_range_indicator_arrow.transform.rotation = Quaternion.LookRotation(direction) * Quaternion.Euler(90, 0, 90);
+    }
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -23,10 +33,12 @@ public class RangeIndicatorHandler : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        UpdateArrowIndicator();
+        if(false == m_b_stop_arrow_direction_update)
+        {
+            UpdateArrowIndicator();
+        }
         UpdateMouseIndicator();
     }
-
 
     public void EnableCircleIndicator(float x, float y, float z)
     {
@@ -65,7 +77,7 @@ public class RangeIndicatorHandler : MonoBehaviour
                 dir.y = 0;
 
                 //Euler Z 90도 회전: 화살표 방향이 플레이어 방향 기준 -90도 회전해 있는 상태임
-                m_range_indicator_arrow.transform.rotation = Quaternion.LookRotation(dir) * Quaternion.Euler(90, 0, 90);
+                SetArrowDirection(dir);
             }
         }
     }
