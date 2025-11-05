@@ -130,6 +130,8 @@ public class PlayerMove : MonoBehaviour
 
         SetArrived();
 
+        ResetIndicators();
+
         m_cur_indicating = eSkill.Q;
         m_range_indicator_handler.EnableCircleIndicator(m_q_radius, m_q_radius, m_q_radius);
         m_range_indicator_handler.EnableArrowIndicator(m_q_radius);
@@ -225,6 +227,7 @@ public class PlayerMove : MonoBehaviour
             return;
         }
 
+        ResetIndicators();
         m_cur_indicating = eSkill.W;
         m_range_indicator_handler.EnableCircleIndicator(m_w_radius, m_w_radius, m_w_radius);
         m_range_indicator_handler.EnableMouseIndicator(m_w_radius);
@@ -285,6 +288,7 @@ public class PlayerMove : MonoBehaviour
             return;
         }
 
+        ResetIndicators();
         m_cur_indicating = eSkill.E;
         m_range_indicator_handler.EnableArrowIndicator(m_E_dist);
     }
@@ -330,6 +334,7 @@ public class PlayerMove : MonoBehaviour
             return;
         }
 
+        ResetIndicators();
         m_cur_indicating = eSkill.R;
         m_range_indicator_handler.EnableArrowIndicator(m_R_range);
     }
@@ -407,5 +412,15 @@ public class PlayerMove : MonoBehaviour
     private void SetArrived()
     {
         m_target_position = transform.position;
+    }
+
+    private void ResetIndicators()
+    {
+        m_range_indicator_handler.DisableAllIndicators();
+        var portal_handler = m_W_handle_inst.launched_portal_handler;
+        if (portal_handler && portal_handler.range_indicator)
+        {
+            portal_handler.range_indicator.DisableAllIndicators();
+        }
     }
 }

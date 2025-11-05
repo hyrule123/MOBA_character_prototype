@@ -173,11 +173,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &307533659 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8105631272696106958, guid: 2e89395d527aeea40bee9f9a1fd1e906, type: 3}
-  m_PrefabInstance: {fileID: 324118678}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &324118678
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -964,7 +959,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7e980224e653bd47b0efeabac382d8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_upper_arm: {fileID: 307533659}
+  m_upper_arm: {fileID: 2117804861}
   m_lower_arm: {fileID: 826334463}
   m_blue_portal_on_arm: {fileID: 1704791789}
   m_blue_portal_prefab: {fileID: 671436020413560329, guid: 499005c9340309043bbfbed108608480, type: 3}
@@ -987,6 +982,11 @@ MonoBehaviour:
 GameObject:
   m_CorrespondingSourceObject: {fileID: 671436020413560329, guid: 499005c9340309043bbfbed108608480, type: 3}
   m_PrefabInstance: {fileID: 8386947492432089192}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &2117804861 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2175230138032124607, guid: 2e89395d527aeea40bee9f9a1fd1e906, type: 3}
+  m_PrefabInstance: {fileID: 324118678}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &4709792567339264035 stripped
 GameObject:

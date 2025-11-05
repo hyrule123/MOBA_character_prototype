@@ -32,6 +32,13 @@ public class Skill_Q_Handler : MonoBehaviour
             m_casted_blue_portal_inst = Instantiate(m_blue_portal_prefab, this.transform);
             m_casted_blue_portal_inst.transform.localPosition = new Vector3(0, 1, 0.5f);
             m_casted_blue_portal_inst.transform.localScale = new Vector3(2, 2, 2);
+
+            //포탈의 방향을 지정 방향으로 회전시킨다.
+            Vector3 pos = m_portal_inst.transform.position;
+            pos.y = 0;
+            m_target_direction.y = 0;
+            Vector3 dir = m_target_direction - pos;
+            m_portal_inst.transform.rotation = Quaternion.LookRotation(dir);
         }
 
         if (m_upper_arm)
