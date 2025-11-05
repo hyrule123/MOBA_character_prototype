@@ -350,6 +350,7 @@ public class PlayerMove : MonoBehaviour
                 //궁극기 스크립트 활성화
                 if(m_R_handle_inst)
                 {
+                    m_R_handle_inst.SetParameters(m_W_handle_inst.launched_portal_handler);
                     m_R_handle_inst.enabled = true;
                 }
 

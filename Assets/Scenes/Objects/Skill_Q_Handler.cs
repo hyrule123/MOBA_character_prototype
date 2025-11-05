@@ -6,18 +6,18 @@ public class Skill_Q_Handler : MonoBehaviour
     [SerializeField] private GameObject m_upper_arm;
     [SerializeField] private GameObject m_lower_arm;
 
-    [SerializeField] private GameObject m_blue_portal_inst;
+    [SerializeField] private GameObject m_blue_portal_on_arm;
     [SerializeField] private GameObject m_blue_portal_prefab;
     private GameObject m_casted_blue_portal_inst;
 
     private bool m_b_ready;
     private W_PortalHandler m_portal_inst;
-    private Vector3 m_hit_point;    //W 포탈이 있을 경우 위치 계산에 필요
-    public void SetParameters(W_PortalHandler portal_inst, Vector3 hit_point)
+    private Vector3 m_target_direction;    //W 포탈이 있을 경우 위치 계산에 필요
+    public void SetParameters(W_PortalHandler portal_inst, Vector3 target_direction)
     {
         m_b_ready = true;
         m_portal_inst = portal_inst;
-        m_hit_point = hit_point;
+        m_target_direction = target_direction;
     }
 
     //Q 스킬 시전 시 호출 됨
@@ -28,7 +28,7 @@ public class Skill_Q_Handler : MonoBehaviour
         if (m_portal_inst)
         {
             m_portal_inst.DelayDestroy(true);
-            m_blue_portal_inst.SetActive(false);
+            m_blue_portal_on_arm.SetActive(false);
             m_casted_blue_portal_inst = Instantiate(m_blue_portal_prefab, this.transform);
             m_casted_blue_portal_inst.transform.localPosition = new Vector3(0, 1, 0.5f);
             m_casted_blue_portal_inst.transform.localScale = new Vector3(2, 2, 2);
@@ -65,7 +65,7 @@ public class Skill_Q_Handler : MonoBehaviour
         {
             Destroy(m_casted_blue_portal_inst);
             m_casted_blue_portal_inst = null;
-            m_blue_portal_inst.SetActive(true);
+            m_blue_portal_on_arm.SetActive(true);
         }
 
         m_b_ready = false;

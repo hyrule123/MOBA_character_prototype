@@ -86,6 +86,7 @@ public class RangeIndicatorHandler : MonoBehaviour
     {
         if (m_range_indicator_arrow)
         {
+            m_b_stop_arrow_direction_update = false;
             m_range_indicator_arrow.SetActive(false);
         }
     }
