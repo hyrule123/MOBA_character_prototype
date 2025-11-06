@@ -13,7 +13,7 @@ public enum eCharacterState
 }
 
 public enum eSkill
-{ NONE, Q, W, E, R, Suppressing }
+{ NONE, Q, W, E, R, EE }
 
 public class PlayerMove : MonoBehaviour
 {
@@ -23,6 +23,7 @@ public class PlayerMove : MonoBehaviour
     [SerializeField] private Animator m_animator;
     
     private eCharacterState m_state = eCharacterState.Idle;
+    public eCharacterState state { get { return m_state; } }
 
     //Indicator
     private eSkill m_cur_indicating = eSkill.NONE;
@@ -105,6 +106,12 @@ public class PlayerMove : MonoBehaviour
 
     public void OnSetTarget()
     {
+        if(m_cur_indicating == eSkill.EE)
+        {
+            EE_Start();
+            return;
+        }
+
         if (IsBusy()) { return; }
 
         switch (m_cur_indicating)
@@ -290,6 +297,36 @@ public class PlayerMove : MonoBehaviour
 
     public void ToggleRangeE()
     {
+        Debug.Log("ToggleRange Called!");
+        //E 대시 중 적 캐릭터와 충돌해 제압중이면 다른 동작을 해야 함
+        if(m_state == eCharacterState.Suppressing && m_cur_indicating != eSkill.EE)
+        {
+            ResetIndicators();
+            m_cur_indicating = eSkill.EE;
+
+            m_range_indicator_handler.EnableCircleIndicator(m_q_radius, m_q_radius, m_q_radius);
+            m_range_indicator_handler.EnableArrowIndicator(m_q_radius);
+
+            //포탈이 있을 경우 동작이 달라진다.
+            //제압 상태에서는 포탈이 사라지지 않는다.(설정한 제압 시간만큼만 증가)
+            var portal_handler = m_W_handle_inst.launched_portal_handler;
+            if (portal_handler)
+            {
+                portal_handler.range_indicator.EnableCircleIndicator(m_q_radius, m_q_radius, m_q_radius);
+                portal_handler.range_indicator.EnableArrowIndicator(m_q_radius);
+
+                //화살표 방향 업데이트를 중지한다.
+                m_range_indicator_handler.stop_arrow_direction_update = true;
+
+                //현재 플레이어가 향하고 있는 방향을 바라보도록 지정
+                Vector3 fwd = transform.forward;
+                fwd.y = 0;
+                m_range_indicator_handler.SetArrowDirection(fwd);
+            }
+
+            return;
+        }
+
         if (IsBusy())
         {
             return;
@@ -332,8 +369,24 @@ public class PlayerMove : MonoBehaviour
     public void E_End()
     {
         SetArrived();
-        TransitionState(eCharacterState.Idle);
+        //Suppression 상태에서도 이 함수가 호출됨 - 예외 처리 필요
+        if(m_state == eCharacterState.E)
+        {
+            TransitionState(eCharacterState.Idle);
+            ResetIndicators();
+        }
     }
+
+    public void EE_End()
+    {
+        SetArrived();
+        ResetIndicators();
+        if(Get_W_PortalHandler())
+        {
+            Get_W_PortalHandler().DelayDestroy(false);
+        }
+    }
+
     public void ToggleRangeR()
     {
         if (IsBusy())
@@ -382,6 +435,35 @@ public class PlayerMove : MonoBehaviour
         TransitionState(eCharacterState.Idle);
     }
 
+    public void EE_Start()
+    {
+        if (m_camera)
+        {
+            Ray ray = m_camera.ScreenPointToRay(Input.mousePosition);
+
+            if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, m_ground_mask))
+            {
+                //기본 방향: 마우스 지정 방향
+                Vector3 dir = hit.point - transform.position;
+                dir.y = 0;
+
+                //만약 포탈이 있다면: 플레이어의 정면 방향으로 시전
+                if (m_W_handle_inst.launched_portal_handler)
+                {
+                    dir = transform.forward;
+                    dir.y = 0;
+                }
+
+                //회전시킨 뒤 
+                transform.rotation = Quaternion.LookRotation(dir);
+
+                Vector3 target_pos = hit.point;
+                target_pos.y = 0;
+                m_E_handle_inst.EE_Start(Get_W_PortalHandler(), target_pos);
+            }
+        }
+    }
+
     public void OnMove()
     {
         if (m_camera)
@@ -398,6 +480,8 @@ public class PlayerMove : MonoBehaviour
 
     private void MoveTo(Vector3 newPosition)
     {
+        if(IsBusy()) { return; }
+
         m_target_position = newPosition;
         m_target_position.y = 0;
 
@@ -429,5 +513,10 @@ public class PlayerMove : MonoBehaviour
         {
             portal_handler.range_indicator.DisableAllIndicators();
         }
+    }
+
+    public W_PortalHandler Get_W_PortalHandler()
+    {
+        return m_W_handle_inst.launched_portal_handler;
     }
 }

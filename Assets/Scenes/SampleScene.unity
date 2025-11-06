@@ -1340,8 +1340,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afe5806ce5217d348a291de0ac15270a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_animator: {fileID: 324118679}
+  m_dash_dist: 3
+  m_dash_duration: 0.2
   m_skill_E_collider_handler: {fileID: 1742967691}
+  m_suppression_time: 1.5
+  m_throw_force: 3
+  m_upward_force: 1
 --- !u!114 &1634319099
 MonoBehaviour:
   m_ObjectHideFlags: 0
