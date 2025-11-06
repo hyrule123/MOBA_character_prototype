@@ -4,6 +4,9 @@ using NUnit.Framework;
 
 public class Skill_E_Hanlder : MonoBehaviour
 {
+    private PlayerMove m_owner;
+    public PlayerMove owner { set { m_owner = value; } }
+
     private float m_dash_dist = 3f;
     private float m_dash_duration = 0.2f;
 
@@ -27,6 +30,7 @@ public class Skill_E_Hanlder : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        Assert.IsNotNull(m_owner, "owner script가 설정되지 않음.");
     }
 
     private void OnEnable()
@@ -71,6 +75,23 @@ public class Skill_E_Hanlder : MonoBehaviour
         if(m_cur_coroutine != null)
         {
             StopCoroutine(m_cur_coroutine);
+
+            var enemy_move = col.gameObject.GetComponent<EnemyMove>();
+            if(enemy_move)
+            {
+                enemy_move.TransitionState(eEnemyState.Supperessed);
+                m_owner.TransitionState(eCharacterState.Suppressing);
+
+                Transform enemy_root = col.transform.root;
+                Transform this_root = transform.root;
+
+                enemy_root.SetParent(this_root);
+                enemy_root.transform.localPosition = new Vector3(0, 0, 0.5f);
+
+                //캐릭터가 보고 있는 방향과 일치시킨다
+                enemy_root.rotation = Quaternion.LookRotation(this_root.forward);
+            }
+
             this.enabled = false;
         }
     }

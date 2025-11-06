@@ -8,11 +8,12 @@ public enum eCharacterState
     Q,
     W,
     E,
-    R
+    R,
+    Suppressing
 }
 
 public enum eSkill
-{ NONE, Q, W, E, R }
+{ NONE, Q, W, E, R, Suppressing }
 
 public class PlayerMove : MonoBehaviour
 {
@@ -58,6 +59,7 @@ public class PlayerMove : MonoBehaviour
     private void Awake()
     {
         m_Q_handle_inst.owner = this;
+        m_E_handle_inst.owner = this;
     }
 
     void Start()
