@@ -55,6 +55,11 @@ public class PlayerMove : MonoBehaviour
         return m_state > eCharacterState.Moving;
     }
 
+    private void Awake()
+    {
+        m_Q_handle_inst.owner = this;
+    }
+
     void Start()
     {
         m_camera = Camera.main;

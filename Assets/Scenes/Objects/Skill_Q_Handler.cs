@@ -1,8 +1,12 @@
 using NUnit.Framework;
+using System.Collections;
 using UnityEngine;
 
 public class Skill_Q_Handler : MonoBehaviour
 {
+    private MonoBehaviour m_owner;
+    public MonoBehaviour owner { set { m_owner = value; } }
+
     [SerializeField] private GameObject m_upper_arm;
     [SerializeField] private GameObject m_lower_arm;
     [SerializeField] private GameObject m_fist_collider_obj;
@@ -11,6 +15,11 @@ public class Skill_Q_Handler : MonoBehaviour
     [SerializeField] private GameObject m_blue_portal_prefab;
     private GameObject m_casted_blue_portal_inst;
 
+    //그랩
+    [SerializeField] private float m_grab_pull_speed = 5f;
+    private float m_max_grab_time = 5f;
+
+    //기본 Parameter
     private bool m_b_ready;
     private W_PortalHandler m_portal_inst;
     private Vector3 m_target_direction;    //W 포탈이 있을 경우 위치 계산에 필요
@@ -33,7 +42,7 @@ public class Skill_Q_Handler : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-
+        Assert.IsNotNull(m_owner);
     }
 
     // Update is called once per frame
@@ -119,11 +128,50 @@ public class Skill_Q_Handler : MonoBehaviour
     {
         Debug.Log("Enemy grabbed!!");
 
-        //
         EnemyMove enemy_move = collider.gameObject.GetComponent<EnemyMove>();
         if (enemy_move)
         {
             enemy_move.TransitionState(eEnemyState.Supperessed);
+
+            //이 스크립트는 Disable 될 예정이므로,
+            //Disable 되지 않는 주인 Script에 코루틴 함수를 보낸다.
+            m_owner.StartCoroutine(PullEnemyTowardPlayer(collider.gameObject));
+        }
+    }
+
+    public IEnumerator PullEnemyTowardPlayer(GameObject obj)
+    {
+        float acc_time = 0f;
+
+        while(acc_time < m_max_grab_time)
+        {
+            acc_time += Time.deltaTime;
+
+            //출발점: obj 위치
+            Vector3 src = obj.transform.position;
+
+            Transform root_transform = transform.root.transform;
+            //도착점: 플레이어 앞
+            Vector3 dest = root_transform.position;
+            dest += (root_transform.forward * 0.5f);
+
+            Vector3 dir = dest - src;
+            dir.y = 0;
+            float dist = dir.magnitude;
+
+            if (dist <= 0.01f) { break; }
+
+            dir.Normalize();
+            obj.transform.position += (dir * m_grab_pull_speed * Time.deltaTime);
+
+            yield return null;
+        }
+
+        //그랩 끝나면 제압상태 해제
+        EnemyMove enemy_script = obj.GetComponent<EnemyMove>();
+        if (enemy_script)
+        {
+            enemy_script.TransitionState(eEnemyState.Idle);
         }
     }
 }
