@@ -1,18 +1,27 @@
 using UnityEngine;
 using System.Collections;
+using NUnit.Framework;
 
 public class Skill_E_Hanlder : MonoBehaviour
 {
     private float m_dash_dist = 3f;
     private float m_dash_duration = 0.2f;
-    [SerializeField] private Animator m_animator;
-    
-    private readonly int m_E_duration_hash = Animator.StringToHash("m_E_duration_hash");
+
+    [SerializeField] private Skill_E_ColliderHandler m_skill_E_collider_handler;
+
+    private Coroutine m_cur_coroutine;
 
     public void SetParameters(float  dash_dist, float dash_duration)
     {
         m_dash_dist = dash_dist; 
         m_dash_duration = dash_duration;
+    }
+
+    private void Awake()
+    {
+        Assert.IsNotNull(m_skill_E_collider_handler);
+        m_skill_E_collider_handler.owner = this;
+        m_skill_E_collider_handler.gameObject.SetActive(false);
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -22,21 +31,20 @@ public class Skill_E_Hanlder : MonoBehaviour
 
     private void OnEnable()
     {
-        if(m_animator)
-        {
-            m_animator.SetFloat(m_E_duration_hash, m_dash_duration);
-        }
-        StartCoroutine(Dash());
+        m_skill_E_collider_handler.gameObject.SetActive(true);
+        m_cur_coroutine = StartCoroutine(Dash());
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnDisable()
     {
-        
+        m_cur_coroutine = null;
+        m_skill_E_collider_handler.gameObject.SetActive(false);
     }
 
     private IEnumerator Dash()
     {
+        Debug.Log("Dash coroutine called");
+
         float start_time = Time.time;
         Vector3 start_pos = transform.position;
         //캐릭터가 바라보는 방향
@@ -55,5 +63,15 @@ public class Skill_E_Hanlder : MonoBehaviour
         // 목표 지점에 정확히 위치시키고 종료
         transform.position = target_pos;
         this.enabled = false;
+    }
+
+    public void EnemyHit(Collider col)
+    {
+        Debug.Log("E skill hit enemy!!");
+        if(m_cur_coroutine != null)
+        {
+            StopCoroutine(m_cur_coroutine);
+            this.enabled = false;
+        }
     }
 }

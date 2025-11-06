@@ -539,6 +539,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6731807414786439465, guid: 2e89395d527aeea40bee9f9a1fd1e906, type: 3}
       insertIndex: -1
       addedObject: {fileID: 353123508}
+    - targetCorrespondingSourceObject: {fileID: 6731807414786439465, guid: 2e89395d527aeea40bee9f9a1fd1e906, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1742967690}
     - targetCorrespondingSourceObject: {fileID: 2036894659733576097, guid: 2e89395d527aeea40bee9f9a1fd1e906, type: 3}
       insertIndex: -1
       addedObject: {fileID: 422505167}
@@ -1338,6 +1341,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_animator: {fileID: 324118679}
+  m_skill_E_collider_handler: {fileID: 1742967691}
 --- !u!114 &1634319099
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1377,6 +1381,7 @@ MonoBehaviour:
   m_fist_collider_obj: {fileID: 422505166}
   m_blue_portal_on_arm: {fileID: 1704791789}
   m_blue_portal_prefab: {fileID: 671436020413560329, guid: 499005c9340309043bbfbed108608480, type: 3}
+  m_grab_pull_speed: 2
 --- !u!114 &1634319101
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1858,6 +1863,102 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 671436020413560329, guid: 499005c9340309043bbfbed108608480, type: 3}
   m_PrefabInstance: {fileID: 8386947492432089192}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1742967689
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1742967690}
+  - component: {fileID: 1742967693}
+  - component: {fileID: 1742967692}
+  - component: {fileID: 1742967691}
+  m_Layer: 7
+  m_Name: Skill_E_Collider
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1742967690
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1742967689}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1634319097}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1742967691
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1742967689}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ffcd6ce57a5ade4ab503c2a2da9fe73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!54 &1742967692
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1742967689}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!136 &1742967693
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1742967689}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 1
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2117804861 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2175230138032124607, guid: 2e89395d527aeea40bee9f9a1fd1e906, type: 3}
