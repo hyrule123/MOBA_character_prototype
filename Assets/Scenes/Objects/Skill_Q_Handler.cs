@@ -5,6 +5,7 @@ public class Skill_Q_Handler : MonoBehaviour
 {
     [SerializeField] private GameObject m_upper_arm;
     [SerializeField] private GameObject m_lower_arm;
+    [SerializeField] private GameObject m_fist_collider_obj;
 
     [SerializeField] private GameObject m_blue_portal_on_arm;
     [SerializeField] private GameObject m_blue_portal_prefab;
@@ -18,6 +19,37 @@ public class Skill_Q_Handler : MonoBehaviour
         m_b_ready = true;
         m_portal_inst = portal_inst;
         m_target_direction = target_direction;
+    }
+
+    private void Awake()
+    {
+        Assert.IsNotNull(m_fist_collider_obj);
+        Skill_Q_CollisionHandler handler = m_fist_collider_obj.GetComponent<Skill_Q_CollisionHandler>();
+        Assert.IsNotNull(handler);
+        handler.owner_script = this;
+        m_fist_collider_obj.SetActive(false);
+    }
+
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
+    {
+
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
+    }
+
+    private void LateUpdate()
+    {
+        //포탈 방향에서 팔이 발사되는 느낌
+        if (m_portal_inst)
+        {
+            m_upper_arm.transform.position = m_portal_inst.transform.position;
+            m_upper_arm.transform.rotation = Quaternion.LookRotation(m_portal_inst.transform.forward);
+        }
     }
 
     //Q 스킬 시전 시 호출 됨
@@ -49,11 +81,15 @@ public class Skill_Q_Handler : MonoBehaviour
         {
             m_lower_arm.transform.localScale = Vector3.one * 2;
         }
+
+        m_fist_collider_obj.SetActive(true);
     }
 
     //Q 스킬 종료 시 호출됨
     private void OnDisable()
     {
+        m_fist_collider_obj.SetActive(false);
+
         if (m_upper_arm)
         {
             m_upper_arm.transform.localScale = Vector3.one;
@@ -77,27 +113,17 @@ public class Skill_Q_Handler : MonoBehaviour
 
         m_b_ready = false;
     }
-
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+       
+    //주먹 쪽에서 적 감지시 이 함수가 호출
+    public void EnemyHit(Collider collider)
     {
-        
-    }
+        Debug.Log("Enemy grabbed!!");
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-    private void LateUpdate()
-    {
-        //포탈 방향에서 팔이 발사되는 느낌
-        if (m_portal_inst)
+        //
+        EnemyMove enemy_move = collider.gameObject.GetComponent<EnemyMove>();
+        if (enemy_move)
         {
-            m_upper_arm.transform.position = m_portal_inst.transform.position;
-            m_upper_arm.transform.rotation = Quaternion.LookRotation(m_portal_inst.transform.forward);
+            enemy_move.TransitionState(eEnemyState.Supperessed);
         }
     }
 }

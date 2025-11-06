@@ -133,7 +133,6 @@ GameObject:
   - component: {fileID: 6473729831147596689}
   - component: {fileID: 6645189982420070867}
   - component: {fileID: 3198363165494772260}
-  - component: {fileID: 7605956509299770030}
   m_Layer: 0
   m_Name: Skill_R_Camera
   m_TagString: Untagged
@@ -234,18 +233,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -3298800115395149385, guid: 18207bda97474a24d9a2138466b7ecfa, type: 3}
---- !u!114 &7605956509299770030
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9075550806377165691}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 21e08f30e82971d499823c40689e4524, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &4176276026284036905
 PrefabInstance:
   m_ObjectHideFlags: 0
