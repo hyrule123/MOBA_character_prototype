@@ -141,19 +141,19 @@ public class Skill_Q_Handler : MonoBehaviour
 
     public IEnumerator PullEnemyTowardPlayer(GameObject obj)
     {
+        //도착점: 플레이어 앞
+        Transform root_transform = transform.root.transform;
+        Vector3 dest = root_transform.position;
+        dest += (root_transform.forward * 0.5f);
+
         float acc_time = 0f;
 
-        while(acc_time < m_max_grab_time)
+        while (acc_time < m_max_grab_time)
         {
             acc_time += Time.deltaTime;
 
             //출발점: obj 위치
             Vector3 src = obj.transform.position;
-
-            Transform root_transform = transform.root.transform;
-            //도착점: 플레이어 앞
-            Vector3 dest = root_transform.position;
-            dest += (root_transform.forward * 0.5f);
 
             Vector3 dir = dest - src;
             dir.y = 0;
@@ -166,6 +166,7 @@ public class Skill_Q_Handler : MonoBehaviour
 
             yield return null;
         }
+        obj.transform.position = dest;
 
         //그랩 끝나면 제압상태 해제
         EnemyMove enemy_script = obj.GetComponent<EnemyMove>();
