@@ -149,11 +149,19 @@ public class Skill_E_Hanlder : MonoBehaviour
             //포탈이 있으면
             if (m_orange_portal_handler)
             {
+                //파란색 포탈 처리
+                m_owner.StartCoroutine(BluePortalCoroutine());
 
-                //while()
+                //enemy의 위치를 주황색 포탈 위치로 이동
+                enemy_root.position = m_orange_portal_handler.transform.position;
+
+                Vector3 dir = m_EE_target_pos - m_orange_portal_handler.transform.position;
+                dir.y = 0;
 
 
-                yield return null;
+                //던진다
+                ThrowEnemy(enemy_root);
+                enemy_move.b_thrown = true;
             }
             //포탈이 없으면 바로 적을 던져버린다
             else
@@ -161,6 +169,21 @@ public class Skill_E_Hanlder : MonoBehaviour
                 ThrowEnemy(enemy_root);
                 enemy_move.b_thrown = true;
             }
+        }
+
+        IEnumerator BluePortalCoroutine()
+        {
+            m_owner.blue_portal_on_arm.SetActive(false);
+
+            //파란색 포탈 소환
+            var casted_portal = Instantiate(m_owner.blue_portal_prefab, this.transform);
+            casted_portal.transform.localPosition = new Vector3(0, 1, 0.5f);
+            casted_portal.transform.localScale = new Vector3(2, 2, 2);
+
+            yield return new WaitForSeconds(2f);
+
+            m_owner.blue_portal_on_arm.SetActive(true);
+            Destroy(casted_portal);
         }
 
 
@@ -175,7 +198,6 @@ public class Skill_E_Hanlder : MonoBehaviour
 
     void ThrowEnemy(Transform enemy_transform)
     {
-
         enemy_transform.SetParent(null);
         //땅에서 살~짝 띄워준다(Ground Check 스크립트가 바로 작동하지 않도록)
         enemy_transform.position = enemy_transform.position + new Vector3(0, 0.01f, 0);

@@ -4,16 +4,15 @@ using UnityEngine;
 
 public class Skill_Q_Handler : MonoBehaviour
 {
-    private MonoBehaviour m_owner;
-    public MonoBehaviour owner { set { m_owner = value; } }
+    private PlayerMove m_owner;
+    public PlayerMove owner { set { m_owner = value; } }
 
     [SerializeField] private GameObject m_upper_arm;
     [SerializeField] private GameObject m_lower_arm;
     [SerializeField] private GameObject m_fist_collider_obj;
 
-    [SerializeField] private GameObject m_blue_portal_on_arm;
-    [SerializeField] private GameObject m_blue_portal_prefab;
     private GameObject m_casted_blue_portal_inst;
+
 
     //그랩
     [SerializeField] private float m_grab_pull_speed = 5f;
@@ -69,8 +68,9 @@ public class Skill_Q_Handler : MonoBehaviour
         if (m_portal_inst)
         {
             m_portal_inst.DelayDestroy(true);
-            m_blue_portal_on_arm.SetActive(false);
-            m_casted_blue_portal_inst = Instantiate(m_blue_portal_prefab, this.transform);
+
+            m_owner.blue_portal_on_arm.SetActive(false);
+            m_casted_blue_portal_inst = Instantiate(m_owner.blue_portal_prefab, this.transform);
             m_casted_blue_portal_inst.transform.localPosition = new Vector3(0, 1, 0.5f);
             m_casted_blue_portal_inst.transform.localScale = new Vector3(2, 2, 2);
 
@@ -117,7 +117,7 @@ public class Skill_Q_Handler : MonoBehaviour
         {
             Destroy(m_casted_blue_portal_inst);
             m_casted_blue_portal_inst = null;
-            m_blue_portal_on_arm.SetActive(true);
+            m_owner.blue_portal_on_arm.SetActive(true);
         }
 
         m_b_ready = false;

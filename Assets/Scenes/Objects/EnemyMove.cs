@@ -41,14 +41,13 @@ public class EnemyMove : MonoBehaviour
         m_animator.SetInteger(m_state_hash, ((int)state));
     }
 
-
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        if(false == m_b_thrown) { return; }
+        if (false == m_b_thrown) { return; }
 
         m_b_thrown = false;
         var rb = GetComponent<Rigidbody>();
-        if(rb)
+        if (rb)
         {
             rb.isKinematic = true;
             rb.useGravity = false;

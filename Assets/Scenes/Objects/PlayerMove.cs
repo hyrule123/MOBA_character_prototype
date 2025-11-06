@@ -29,6 +29,12 @@ public class PlayerMove : MonoBehaviour
     private eSkill m_cur_indicating = eSkill.NONE;
     [SerializeField] private RangeIndicatorHandler m_range_indicator_handler;
 
+    [Header("포탈 관련 클래스")]
+    [SerializeField] private GameObject m_blue_portal_on_arm;
+    public GameObject blue_portal_on_arm { get { return m_blue_portal_on_arm; } }
+    [SerializeField] private GameObject m_blue_portal_prefab;
+    public GameObject blue_portal_prefab { get { return m_blue_portal_prefab; } }
+
     [Header("이동 관련 설정")]
     [SerializeField] private float m_move_speed = 3.0f;    // 초당 이동 속도
     [SerializeField] private float m_stop_dist = 0.1f; // 목표 지점과 이 거리만큼 가까워지면 멈춤

@@ -1312,6 +1312,8 @@ MonoBehaviour:
     m_Bits: 64
   m_animator: {fileID: 324118679}
   m_range_indicator_handler: {fileID: 353123507}
+  m_blue_portal_on_arm: {fileID: 1704791789}
+  m_blue_portal_prefab: {fileID: 671436020413560329, guid: 499005c9340309043bbfbed108608480, type: 3}
   m_move_speed: 3
   m_stop_dist: 0.1
   m_q_radius: 3
@@ -1383,8 +1385,6 @@ MonoBehaviour:
   m_upper_arm: {fileID: 2117804861}
   m_lower_arm: {fileID: 826334463}
   m_fist_collider_obj: {fileID: 422505166}
-  m_blue_portal_on_arm: {fileID: 1704791789}
-  m_blue_portal_prefab: {fileID: 671436020413560329, guid: 499005c9340309043bbfbed108608480, type: 3}
   m_grab_pull_speed: 2
 --- !u!114 &1634319101
 MonoBehaviour:
